@@ -4,6 +4,9 @@ import Data.Array
 import System.IO
 import System.Random
 
+import Data.Map (Map)
+import qualified Data.Map as Map
+
 {- Stack machine for running whitespace programs -}
 
 data Instruction =
@@ -40,10 +43,10 @@ type Loc = Integer
 
 type Program = [Instruction]
 newtype Stack = Stack [Integer]
-type Heap = [Integer]
+type Heap = Map Integer Integer
 
 data VMState = VM {
-        program :: Program,
+    program :: Program,
 	valstack :: Stack,
 	callstack :: Stack,
 	memory :: Heap,
@@ -139,15 +142,18 @@ findLabel' m (_:xs) i = findLabel' m xs (i+1)
 -- Heap management
 
 retrieve :: Integer -> Heap -> IO Integer
-retrieve x heap = return (heap!!(fromInteger x))
+-- retrieve x heap = return (heap!!(fromInteger x))
+retrieve x heap = return (Map.findWithDefault 0 x heap)
 
 store :: Integer -> Integer -> Heap -> IO Heap
-store x 0 (h:hs) = return (x:hs)
-store x n (h:hs) = do hp <- store x (n-1) hs
-		      return (h:hp)
-store x 0 [] = return (x:[])
-store x n [] = do hp <- store x (n-1) [] 
-		  return (0:hp)
+store x n heap = do
+    return (Map.insert n x heap)
+-- store x 0 (h:hs) = return (x:hs)
+-- store x n (h:hs) = do hp <- store x (n-1) hs
+-- 		      return (h:hp)
+-- store x 0 [] = return (x:[])
+-- store x n [] = do hp <- store x (n-1) [] 
+-- 		  return (0:hp)
 
 -- Shuffling the stack
 

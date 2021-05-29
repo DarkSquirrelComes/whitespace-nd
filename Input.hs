@@ -3,6 +3,9 @@ module Input where
 import VM
 import Tokens
 
+import Data.Map (Map)
+import qualified Data.Map as Map
+
 {- Input to the whitespace VM.
    For convenience, three input characters 
        A => space, B => tab, C => either of CR/LF
@@ -54,7 +57,7 @@ execute fname = do
    prog <- readFile fname
    let tokens = tokenise prog
    let runtime = parse tokens
-   vm (VM runtime (Stack []) (Stack []) [] 0)
+   vm (VM runtime (Stack []) (Stack []) (Map.empty) 0)
 
 tokenise :: String -> [Token]
 tokenise [] = []
